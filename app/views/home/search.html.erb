@@ -1,0 +1,12 @@
+<%= form_with(url: "/search", local: true) do %>
+  <%= label_tag(:q, "Search for:") %>
+  <%= text_field_tag(:q) %>
+  <%= submit_tag("Search") %>
+<% end %>
+<% if @expedientes %>
+  <% @expedientes.each do |expte|%>
+    <div style="border: 1px solid black">
+      <%= link_to expte[0]+" - "+expte[1], expte[2], target: "_blank" %>
+    </div>
+  <% end %>
+<% end %>
