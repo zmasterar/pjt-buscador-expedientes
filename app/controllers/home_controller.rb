@@ -4,7 +4,7 @@ class HomeController < ApplicationController
   end
   def search
     if params[:q]==""
-      redirect_to root_path 
+      
     else
       if params[:q] =~ /\d+\/(?:\d{4}|\d{2})/
         login_url="https://login.justucuman.gov.ar/login"
@@ -58,10 +58,12 @@ class HomeController < ApplicationController
             create_link(expte.at_css("a"))
           ]
           )
+          expte.at_css("a").attributes["href"].value=create_link(expte.at_css("a"))
+          expte.at_css("a")["target"]="_blank"
         end
 
       else
-        redirect_to root_path
+        
       end
     end
 
