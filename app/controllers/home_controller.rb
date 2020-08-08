@@ -52,14 +52,17 @@ class HomeController < ApplicationController
         @response=exptes
         @expedientes = []
         exptes.each do |expte|
+          link = expte.at_css("a")
           puts expte.at_css("strong").inner_text
           @expedientes.push([expte.at_css("strong").inner_text,
             expte.css("strong")[1].inner_text,
             create_link(expte.at_css("a"))
           ]
           )
-          expte.at_css("a").attributes["href"].value=create_link(expte.at_css("a"))
-          expte.at_css("a")["target"]="_blank"
+          if link
+            link.attributes["href"].value=create_link(expte.at_css("a"))
+            link["target"]="_blank"
+          end
         end
 
       else
@@ -83,6 +86,7 @@ class HomeController < ApplicationController
   end
 
   def create_link(anchor)
+    return unless anchor
     last_bit=anchor["href"].scan(/.+(\/.+)$/).last[0]
     anchor["href"].gsub("ingreso-escritos/create","expedientes").gsub(last_bit,"/historia")
   end
