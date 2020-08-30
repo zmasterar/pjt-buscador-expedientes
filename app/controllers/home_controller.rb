@@ -36,21 +36,19 @@ class HomeController < ApplicationController
         @response=exptes
         @expedientes = []
         exptes.each do |expte|
-          link = expte.at_css("a")
-          puts expte.at_css("strong").inner_text
+          raw_links = expte.css("a")
+          links = []
+          raw_links.each do |link|
+            links << create_link(link)
+          end
           @expedientes.push([expte.at_css("strong").inner_text,
-            expte.css("strong")[1].inner_text,
-            create_link(expte.at_css("a"))
-          ]
+            expte.css("strong")[1].inner_text, links]
           )
-          if link
-            link.attributes["href"].value=create_link(expte.at_css("a"))
+          raw_links.each do |link|
+            link.attributes["href"].value=create_link(link)
             link["target"]="_blank"
           end
         end
-
-      else
-        
       end
     end
 
