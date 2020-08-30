@@ -4,7 +4,7 @@ class HomeController < ApplicationController
   end
   def search
     if params[:q]==""
-      
+      #do nothing
     else
       if params[:q] =~ /\d+\/(?:\d{4}|\d{2})/
         response=HTTParty.get(
