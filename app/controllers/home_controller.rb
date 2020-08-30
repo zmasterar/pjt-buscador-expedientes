@@ -1,7 +1,5 @@
 class HomeController < ApplicationController
   include HTTParty
-  def index
-  end
   def search
     if params[:q]==""
       #do nothing
