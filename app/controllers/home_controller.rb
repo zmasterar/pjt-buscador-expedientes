@@ -54,6 +54,15 @@ class HomeController < ApplicationController
 
   end
 
+  def file
+    response=HTTParty.get(
+      "https://portaldelsae.justucuman.gov.ar/expedientes/contencioso/#{params[:file]}/historia", 
+      cookies: parse_cookies(login())
+      )
+    doc = Nokogiri::HTML(response)
+    @doc = doc.at_css("#main-body")
+  end
+
 
   private
   def parse_cookies(response)
@@ -70,6 +79,11 @@ class HomeController < ApplicationController
   def create_link(anchor)
     return unless anchor
     last_bit=anchor["href"].scan(/.+(\/.+)$/).last[0]
+    fuero=last_bit.gsub("/","")
+    file=anchor["href"].gsub("https://portaldelsae.justucuman.gov.ar/ingreso-escritos/create/contencioso/","").gsub(last_bit,"")
+    "expediente/#{fuero}/#{file}"
+  end
+
   def login
     login_url="https://login.justucuman.gov.ar/login"
     response = HTTParty.get(login_url)
