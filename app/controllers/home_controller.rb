@@ -7,32 +7,16 @@ class HomeController < ApplicationController
       
     else
       if params[:q] =~ /\d+\/(?:\d{4}|\d{2})/
-        login_url="https://login.justucuman.gov.ar/login"
-        response1 = HTTParty.get(login_url)
-        doc = Nokogiri::HTML(response1)
-        token=doc.at('[name="_token"]')["value"]
-
-        response2=HTTParty.post(
-          login_url,
-          multipart: true,
-          body: {
-            username: ENV["PJT_USERNAME"],
-            password: ENV["PJT_PASSWORD"],
-            _token: token
-          },
-          cookies: parse_cookies(response1)
-        )
-
-        response3=HTTParty.get(
+        response=HTTParty.get(
           "https://portaldelsae.justucuman.gov.ar/ingreso-escritos/create", 
-          cookies: parse_cookies(response2)
+          cookies: parse_cookies(login())
           )
-        doc = Nokogiri::HTML(response3)
+        doc = Nokogiri::HTML(response)
         token=doc.at('[name="_token"]')["value"]
 
-        response4=HTTParty.post(
+        response=HTTParty.post(
           "https://portaldelsae.justucuman.gov.ar/ingreso-escritos/create/buscar-expediente",
-          cookies: parse_cookies(response3),
+          cookies: parse_cookies(response),
           headers: {
             "X-Requested-With": "XMLHttpRequest"
           },
@@ -44,7 +28,7 @@ class HomeController < ApplicationController
           }
         )
         
-        response_body=JSON.parse response4.body
+        response_body=JSON.parse response.body
 
         doc = Nokogiri::HTML(response_body["view"])
         exptes = doc.css(".card.mb-3.border-secondary")
@@ -88,6 +72,21 @@ class HomeController < ApplicationController
   def create_link(anchor)
     return unless anchor
     last_bit=anchor["href"].scan(/.+(\/.+)$/).last[0]
-    anchor["href"].gsub("ingreso-escritos/create","expedientes").gsub(last_bit,"/historia")
+  def login
+    login_url="https://login.justucuman.gov.ar/login"
+    response = HTTParty.get(login_url)
+    doc = Nokogiri::HTML(response)
+    token=doc.at('[name="_token"]')["value"]
+
+    HTTParty.post(
+      login_url,
+      multipart: true,
+      body: {
+        username: ENV["PJT_USERNAME"],
+        password: ENV["PJT_PASSWORD"],
+        _token: token
+      },
+      cookies: parse_cookies(response)
+    )
   end
 end
